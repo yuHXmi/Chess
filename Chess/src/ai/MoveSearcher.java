@@ -27,11 +27,15 @@ public class MoveSearcher {
 
     BoardValue search(int depth, Board board, String currentTurn, int alpha, int beta) {
 
+        if (board.isStaleMate(currentTurn)) {
+            return new BoardValue(board, 0);
+        }
+
         if (depth == 0) {
             if (board.pieceList.size() > 12) {
-                return new BoardValue(null, midGameEvaluate.evaluate(board, currentTurn));
+                return new BoardValue(board, midGameEvaluate.evaluate(board, currentTurn));
             }
-            return new BoardValue(null, endGameEvaluate.evaluate(board, currentTurn));
+            return new BoardValue(board, endGameEvaluate.evaluate(board, currentTurn));
         }
 
         BoardValue nextBoard = new BoardValue(null, 0);

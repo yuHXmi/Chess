@@ -21,7 +21,7 @@ public class Bishop extends Piece {
 
     public List<Move> addMoves() {
 
-        List<Move> moves = new ArrayList<Move>();
+        List<Move> moves = new ArrayList<>();
         int[] dx = {1, 1, -1, -1};
         int[] dy = {1, -1, 1, -1};
 

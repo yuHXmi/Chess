@@ -226,13 +226,15 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
-        Move nextMove = null;
+        Move nextMove;
 
         if (currentTurn == playerTurn) {
+
             nextMove = getPlayerMove();
             if (nextMove == null) {
                 return;
             }
+
             Board cloneBoard = board.copyBoard();
             board.makeMove(nextMove);
             if (board.kingIsAttacked(playerTurn)) {

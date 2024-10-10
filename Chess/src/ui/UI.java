@@ -160,6 +160,10 @@ public class UI {
         if (!gp.board.checkPromotion())
             return;
 
+        if (gp.board.promotion == null) {
+            return;
+        }
+
         int row = gp.board.lastMove.end.row;
         int col = gp.board.lastMove.end.col;
         if (gp.playerTurn == "white") {

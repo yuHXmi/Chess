@@ -114,7 +114,7 @@ public class BoardEvaluator {
             -5,  0,  0,  0,  0,  0,  0, -5,
             -5,  0,  0,  0,  0,  0,  0, -5,
             -5,  0,  0,  0,  0,  0,  0, -5,
-            0,  0,  0,  5,  5,  0,  0,  0
+            0,  0,  0,  5,  5,  5,  0,  0
         };
 
         pst[QUEEN] = new int[] {
@@ -136,10 +136,6 @@ public class BoardEvaluator {
     }
 
     int evaluate(Board board, String color) {
-
-        if (board.isStaleMate(color)) {
-            return 0;
-        }
 
         int value = 0;
         for (Piece piece : board.pieceList) {
