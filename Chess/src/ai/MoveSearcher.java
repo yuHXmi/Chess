@@ -1,0 +1,115 @@
+package ai;
+
+import board.Board;
+import main.Move;
+import main.Position;
+import pieces.King;
+import pieces.Pawn;
+import pieces.Piece;
+
+public class MoveSearcher {
+
+    final int maxDepth = 4;
+
+    Board board;
+    String aiTurn;
+    BoardEvaluator midGameEvaluate = new BoardEvaluator(0);
+    BoardEvaluator endGameEvaluate = new BoardEvaluator(1);
+
+    public MoveSearcher(Board board) {
+        this.board = board;
+        aiTurn = changeTurn(board.playerTurn);
+    }
+
+    String changeTurn(String currentTurn) {
+        return currentTurn == "black" ? "white" : "black";
+    }
+
+    BoardValue search(int depth, Board board, String currentTurn, int alpha, int beta) {
+
+        if (depth == 0) {
+            if (board.pieceList.size() > 12) {
+                return new BoardValue(null, midGameEvaluate.evaluate(board, currentTurn));
+            }
+            return new BoardValue(null, endGameEvaluate.evaluate(board, currentTurn));
+        }
+
+        BoardValue nextBoard = new BoardValue(null, 0);
+        if (currentTurn == board.playerTurn) {
+            nextBoard.value = Integer.MIN_VALUE;
+        } else {
+            nextBoard.value = Integer.MAX_VALUE;
+        }
+
+        for (Piece piece : board.pieceList) {
+            if (piece.color != currentTurn) {
+                continue;
+            }
+
+            for (Move move : piece.moves) {
+
+                if (board.pieces[move.end.row][move.end.col] instanceof King) {
+                    if (currentTurn == aiTurn) {
+                        return new BoardValue(board, Integer.MIN_VALUE);
+                    } else {
+                        return new BoardValue(board, Integer.MAX_VALUE);
+                    }
+                }
+
+                Board newBoard = board.copyBoard();
+                newBoard.makeMove(move);
+
+                if (newBoard.checkPromotion()) {
+
+                    Piece lastMovePiece = newBoard.pieces[newBoard.lastMove.end.row][newBoard.lastMove.end.col];
+                    for (int i = 0; i < 4; i++) {
+
+                        Board cloneBoard = newBoard.copyBoard();
+                        cloneBoard.setPromotion(lastMovePiece);
+                        cloneBoard.doPromotion(i);
+
+                        BoardValue currentBoard = new BoardValue(cloneBoard, search(depth - 1, cloneBoard, changeTurn(currentTurn), alpha, beta).value);
+                        if (currentTurn == aiTurn) {
+                            nextBoard.minimize(currentBoard);
+                            beta = Math.min(beta, currentBoard.value);
+                        } else {
+                            nextBoard.maximize(currentBoard);
+                            alpha = Math.max(alpha, currentBoard.value);
+                        }
+
+                        if (alpha >= beta) {
+                            break;
+                        }
+                    }
+                } else {
+
+                    BoardValue currentBoard = new BoardValue(newBoard, search(depth - 1, newBoard, changeTurn(currentTurn), alpha, beta).value);
+                    if (currentTurn == aiTurn) {
+                        nextBoard.minimize(currentBoard);
+                        beta = Math.min(beta, currentBoard.value);
+                    } else {
+                        nextBoard.maximize(currentBoard);
+                        alpha = Math.max(alpha, currentBoard.value);
+                    }
+                    if (depth == maxDepth) {
+                        System.out.print("Value searched: ");
+                        System.out.println(currentBoard.value);
+                    }
+                }
+
+                if (alpha >= beta) {
+                    break;
+                }
+            }
+        }
+
+        return nextBoard;
+    }
+
+    public Board getBoard() {
+        BoardValue boardValue = search(maxDepth, board, aiTurn, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        System.out.print("Move value: ");
+        System.out.println(boardValue.value);
+        return boardValue.board;
+    }
+}
