@@ -16,7 +16,7 @@ public class Queen extends Piece {
     void setDefaultValue() {
         name = "queen";
         type = 4;
-        value = 950;
+        value = 900;
     }
 
     @Override

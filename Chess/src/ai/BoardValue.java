@@ -15,7 +15,7 @@ public class BoardValue {
     }
 
     void maximize(BoardValue other) {
-        if (value < other.value) {
+        if (board == null || value < other.value) {
             board = other.board;
             value = other.value;
             return;
@@ -31,7 +31,7 @@ public class BoardValue {
     }
 
     void minimize(BoardValue other) {
-        if (value > other.value) {
+        if (board == null || value > other.value) {
             board = other.board;
             value = other.value;
             return;

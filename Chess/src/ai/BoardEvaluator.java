@@ -2,6 +2,7 @@ package ai;
 
 import board.Board;
 import pieces.Piece;
+import pieces.Queen;
 
 public class BoardEvaluator {
 
@@ -140,7 +141,10 @@ public class BoardEvaluator {
         int value = 0;
         for (Piece piece : board.pieceList) {
 
-            int pieceValue = piece.value + piece.moves.size();
+            int pieceValue = piece.value;
+            if (piece instanceof Queen) {
+                pieceValue += piece.moves.size();
+            }
             if (piece.color == "white") {
                 pieceValue += pst[piece.type][piece.getID()];
             } else {

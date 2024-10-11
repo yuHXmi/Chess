@@ -2,14 +2,12 @@ package ai;
 
 import board.Board;
 import main.Move;
-import main.Position;
-import pieces.King;
-import pieces.Pawn;
 import pieces.Piece;
 
 public class MoveSearcher {
 
     final int maxDepth = 4;
+    final int midGamePieceThreshold = 12;
 
     Board board;
     String aiTurn;
@@ -29,6 +27,13 @@ public class MoveSearcher {
 
         if (board.isStaleMate(currentTurn)) {
             return new BoardValue(board, 0);
+        }
+
+        if (board.isCheckMate(currentTurn)) {
+            if (currentTurn == aiTurn) {
+                return new BoardValue(board, Integer.MAX_VALUE - depth);
+            }
+            return new BoardValue(board, Integer.MIN_VALUE + depth);
         }
 
         if (depth == 0) {
@@ -52,14 +57,6 @@ public class MoveSearcher {
 
             for (Move move : piece.moves) {
 
-                if (board.pieces[move.end.row][move.end.col] instanceof King) {
-                    if (currentTurn == aiTurn) {
-                        return new BoardValue(board, Integer.MIN_VALUE);
-                    } else {
-                        return new BoardValue(board, Integer.MAX_VALUE);
-                    }
-                }
-
                 Board newBoard = board.copyBoard();
                 newBoard.makeMove(move);
 
@@ -73,6 +70,10 @@ public class MoveSearcher {
                         cloneBoard.doPromotion(i);
 
                         BoardValue currentBoard = new BoardValue(cloneBoard, search(depth - 1, cloneBoard, changeTurn(currentTurn), alpha, beta).value);
+                        if (currentBoard.board.kingIsAttacked(currentTurn)) {
+                            continue;
+                        }
+
                         if (currentTurn == aiTurn) {
                             nextBoard.minimize(currentBoard);
                             beta = Math.min(beta, currentBoard.value);
@@ -88,6 +89,10 @@ public class MoveSearcher {
                 } else {
 
                     BoardValue currentBoard = new BoardValue(newBoard, search(depth - 1, newBoard, changeTurn(currentTurn), alpha, beta).value);
+                    if (currentBoard.board.kingIsAttacked(currentTurn)) {
+                        continue;
+                    }
+
                     if (currentTurn == aiTurn) {
                         nextBoard.minimize(currentBoard);
                         beta = Math.min(beta, currentBoard.value);
@@ -109,6 +114,43 @@ public class MoveSearcher {
 
         return nextBoard;
     }
+
+//    private BoardValue quiescenceSearch(Board board, String currentTurn, int alpha, int beta) {
+//
+//        if (board.isStaleMate(currentTurn)) {
+//            return new BoardValue(board, 0);
+//        }
+//
+//        if (board.isCheckMate(currentTurn)) {
+//            if (currentTurn == aiTurn) {
+//                return new BoardValue(board, Integer.MAX_VALUE);
+//            }
+//            return new BoardValue(board, Integer.MIN_VALUE);
+//        }
+//
+//        int standPat;
+//        if (board.pieceList.size() > midGamePieceThreshold) {
+//            standPat = midGameEvaluate.evaluate(board, currentTurn);
+//        } else {
+//            standPat = endGameEvaluate.evaluate(board, currentTurn);
+//        }
+//
+//        if (standPat >= beta) return new BoardValue(board, beta);
+//        if (alpha < standPat) alpha = standPat;
+//
+//        for (Move move : board.generateTacticalMoves(currentTurn)) {
+//            Board newBoard = board.copyBoard();
+//            newBoard.makeMove(move);
+//
+//            if (newBoard.kingIsAttacked(currentTurn)) continue;
+//
+//            int score = -quiescenceSearch(newBoard, changeTurn(currentTurn), -beta, -alpha).value;
+//
+//            if (score >= beta) return new BoardValue(newBoard, beta);
+//            if (score > alpha) alpha = score;
+//        }
+//        return new BoardValue(board, alpha);
+//    }
 
     public Board getBoard() {
         BoardValue boardValue = search(maxDepth, board, aiTurn, Integer.MIN_VALUE, Integer.MAX_VALUE);

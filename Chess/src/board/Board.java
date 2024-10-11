@@ -55,6 +55,25 @@ public class Board {
         setBoard();
     }
 
+    public List<Move> generateTacticalMoves(String currentTurn) {
+
+        List<Move> moves = new ArrayList<>();
+        for (Piece piece : pieceList) {
+
+            if (piece.color != currentTurn) {
+                continue;
+            }
+
+            for (Move move : piece.moves) {
+                if (isTakePiece(move)) {
+                    moves.add(move);
+                }
+            }
+        }
+
+        return moves;
+    }
+
     public Board copyBoard() {
 
         Board newBoard = new Board(playerTurn);
@@ -150,10 +169,10 @@ public class Board {
         int newRow = move.end.row;
         int newCol = move.end.col;
 
-        if (pieces[oldRow][oldCol] instanceof King && Math.abs(oldCol - newCol) > 2) {
+        if (isCastle(move)) {
             castle(pieces[oldRow][oldCol], pieces[newRow][newCol]);
         } else
-        if (pieces[oldRow][oldCol] instanceof Pawn && oldCol != newCol && pieces[newRow][newCol] == null) {
+        if (isEnpassant(move)) {
             enPassant(move);
         } else {
 
@@ -184,6 +203,27 @@ public class Board {
         int dy = Integer.compare(diffCol, 0);
         makeMove(new Move(rook.position, new Position(king.position.row, king.position.col + dy)));
         makeMove(new Move(king.position, new Position(king.position.row, king.position.col + dy * 2)));
+    }
+
+    public boolean isTakePiece(Move move) {
+        return pieces[move.end.row][move.end.col] != null || isEnpassant(move);
+    }
+
+    public boolean isCastle(Move move) {
+        int oldRow = move.start.row;
+        int oldCol = move.start.col;
+        int newCol = move.end.col;
+
+        return pieces[oldRow][oldCol] instanceof King && Math.abs(oldCol - newCol) > 2;
+    }
+
+    public boolean isEnpassant(Move move) {
+        int oldRow = move.start.row;
+        int oldCol = move.start.col;
+        int newRow = move.end.row;
+        int newCol = move.end.col;
+
+        return pieces[oldRow][oldCol] instanceof Pawn && oldCol != newCol && pieces[newRow][newCol] == null;
     }
 
     public void enPassant(Move move) {

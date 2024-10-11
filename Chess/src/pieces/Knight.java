@@ -21,7 +21,7 @@ public class Knight extends Piece {
 
     public List<Move> addMoves() {
 
-        List<Move> moves = new ArrayList<Move>();
+        List<Move> moves = new ArrayList<>();
         int[] dx = {-2, -1, 1, 2, 2, 1, -1, -2};
         int[] dy = {1, 2, 2, 1, -1, -2, -2, -1};
 
