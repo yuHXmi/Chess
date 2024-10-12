@@ -39,26 +39,43 @@ public class MoveSearcher {
         return currentTurn == "black" ? "white" : "black";
     }
 
-    BoardValue search(int depth, Board board, String currentTurn, int alpha, int beta) {
+    BoardValue opening(String boardPosition) {
+
+        ArrayList<String> moves = openingMoves.get(boardPosition);
+        String turn = "white";
+        Board newBoard = new Board(board.playerTurn);
+        gp.setBoard(newBoard);
+
+        boolean check = false;
+        System.out.println("**********");
+        for (String move : moves) {
+            if (check) {
+                break;
+            }
+            if (newBoard.getPositionKey().equals(boardPosition)) {
+                check = true;
+            }
+            System.out.println(move);
+            Move parsedMove = Move.parseMove(move, newBoard, turn); // Chuyển string nước đi thành đối tượng Move
+            newBoard.makeMove(parsedMove);
+            turn = changeTurn(turn);
+        }
+
+        return new BoardValue(newBoard, 0);  // Trả về giá trị của bàn cờ sau khi thực hiện khai cuộc
+    }
+
+    BoardValue findNextMove() {
 
         String boardPosition = board.getPositionKey();  //tạo ra một key cho vị trí bàn cờ hiện tại
         if (openingMoves.containsKey(boardPosition)) {
             // Nếu vị trí bàn cờ khớp với một khai cuộc, thực hiện nước đi khai cuộc
-            ArrayList<String> moves = openingMoves.get(boardPosition);
-            String turn = "white";
-            Board newBoard = new Board(board.playerTurn);
-            gp.setBoard(newBoard);
-
-            System.out.println("**********");
-            for (int i = 0; i < Math.min(gp.countMove, moves.size()) ; i++) {
-                String nextMove = moves.get(i);
-                System.out.println(nextMove);
-                Move parsedMove = Move.parseMove(nextMove, newBoard, turn); // Chuyển string nước đi thành đối tượng Move
-                newBoard.makeMove(parsedMove);
-                turn = changeTurn(turn);
-            }
-            return new BoardValue(newBoard, 0);  // Trả về giá trị của bàn cờ sau khi thực hiện khai cuộc
+            return opening(boardPosition);
         }
+
+        return search(maxDepth, board, aiTurn, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    BoardValue search(int depth, Board board, String currentTurn, int alpha, int beta) {
 
         if (depth == 0) {
             if (board.pieceList.size() > midGamePieceThreshold) {
@@ -113,7 +130,18 @@ public class MoveSearcher {
                     }
                 } else {
 
-                    BoardValue currentBoard = new BoardValue(newBoard, search(depth - 1, newBoard, changeTurn(currentTurn), alpha, beta).value);
+                    int value;
+                    String boardPosition = board.getPositionKey();
+                    int count = gp.countBoardRepeat.getOrDefault(boardPosition, 0);
+                    if (count == 2) {
+                        value = 0;
+                    } else {
+                        gp.countBoardRepeat.put(boardPosition, count + 1);
+                        value = search(depth - 1, newBoard, changeTurn(currentTurn), alpha, beta).value;
+                        gp.countBoardRepeat.put(boardPosition, count);
+                    }
+
+                    BoardValue currentBoard = new BoardValue(newBoard, value);
 
                     if (currentTurn == aiTurn) {
                         nextBoard.minimize(currentBoard);
@@ -137,45 +165,8 @@ public class MoveSearcher {
         return nextBoard;
     }
 
-//    private BoardValue quiescenceSearch(Board board, String currentTurn, int alpha, int beta) {
-//
-//        if (board.isStaleMate(currentTurn)) {
-//            return new BoardValue(board, 0);
-//        }
-//
-//        if (board.isCheckMate(currentTurn)) {
-//            if (currentTurn == aiTurn) {
-//                return new BoardValue(board, Integer.MAX_VALUE);
-//            }
-//            return new BoardValue(board, Integer.MIN_VALUE);
-//        }
-//
-//        int standPat;
-//        if (board.pieceList.size() > midGamePieceThreshold) {
-//            standPat = midGameEvaluate.evaluate(board, currentTurn);
-//        } else {
-//            standPat = endGameEvaluate.evaluate(board, currentTurn);
-//        }
-//
-//        if (standPat >= beta) return new BoardValue(board, beta);
-//        if (alpha < standPat) alpha = standPat;
-//
-//        for (Move move : board.generateTacticalMoves(currentTurn)) {
-//            Board newBoard = board.copyBoard();
-//            newBoard.makeMove(move);
-//
-//            if (newBoard.kingIsAttacked(currentTurn)) continue;
-//
-//            int score = -quiescenceSearch(newBoard, changeTurn(currentTurn), -beta, -alpha).value;
-//
-//            if (score >= beta) return new BoardValue(newBoard, beta);
-//            if (score > alpha) alpha = score;
-//        }
-//        return new BoardValue(board, alpha);
-//    }
-
     public Board getBoard() {
-        BoardValue boardValue = search(maxDepth, board, aiTurn, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        BoardValue boardValue = findNextMove();
         System.out.print("Move value: ");
         System.out.println(boardValue.value);
         return boardValue.board;

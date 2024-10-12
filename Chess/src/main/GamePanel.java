@@ -8,6 +8,7 @@ import ui.UI;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class GamePanel extends JPanel implements Runnable {
     // BOARD & PIECES
     public Board board;
     public Piece pickedPiece;
-    public int countMove = 1;
+    public Map<String, Integer> countBoardRepeat = new HashMap<>();
 
     // PLAYER
     public String playerTurn = "white";
@@ -97,6 +98,7 @@ public class GamePanel extends JPanel implements Runnable {
         ui = new UI(this);
         board = new Board(playerTurn);
         setBoard(board);
+        countBoardRepeat.put(board.getPositionKey(), 1);
         PGNReader.addGamePanel(this);
         openingMoves = pgnReader.readPGN("res/openings.pgn");  // Đường dẫn tới file PGN
         MoveSearcher.addOpeningMoves(openingMoves);
@@ -297,7 +299,10 @@ public class GamePanel extends JPanel implements Runnable {
         changeTurnDelay = false;
         pickedPiece = null;
         currentTurn = currentTurn == "black" ? "white" : "black";
-        countMove++;
+
+        String boardPosition = board.getPositionKey();
+        int count = countBoardRepeat.getOrDefault(boardPosition, 0);
+        countBoardRepeat.put(boardPosition, count + 1);
     }
 
     public void update() {
@@ -307,7 +312,7 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
-        if (board.isCheckMate(currentTurn)) {
+        if (board.isCheckMate(currentTurn) || board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey()) == 3) {
             isEndGame = true;
         }
 
@@ -358,7 +363,7 @@ public class GamePanel extends JPanel implements Runnable {
         if (board.isCheckMate(currentTurn)) {
             ui.drawText(g2, "CHECKMATE!");
         }
-        if (board.isStaleMate(currentTurn)) {
+        if (board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey()) == 3) {
             ui.drawText(g2, "STALEMATE!");
         }
 
