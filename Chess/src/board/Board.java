@@ -11,59 +11,12 @@ public class Board {
 
     public String playerTurn;
 
-    public final int PAWN = 0;
-    public final int KNIGHT = 1;
-    public final int BISHOP = 2;
-    public final int ROOK = 3;
-    public final int QUEEN = 4;
+    final int PAWN = 0;
+    final int KNIGHT = 1;
+    final int BISHOP = 2;
+    final int ROOK = 3;
+    final int QUEEN = 4;
     public final int KING = 5;
-    public final int EMPTY = 6;
-    public final int BLACK = 7;
-    public final int WHITE = 8;
-
-    final int[] standard_piece = {
-        ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
-        PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
-        ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
-    };
-
-    final int[] standard_color = {
-        BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-        BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,
-        WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
-    };
-
-//    final int[] standard_piece = {
-//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//            EMPTY, EMPTY, ROOK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, KING, EMPTY, EMPTY,
-//            PAWN, ROOK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//            EMPTY, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, KNIGHT,
-//            EMPTY, KING, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//    };
-//
-//    final int[] standard_color = {
-//            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-//            BLACK, BLACK, WHITE, BLACK, BLACK, BLACK, BLACK, WHITE,
-//            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-//            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-//            EMPTY, BLACK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-//            WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, BLACK,
-//            WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
-//    };
 
     public Piece[][] pieces = new Piece[8][8];
     public List<Piece> pieceList = new ArrayList<>();
@@ -253,54 +206,6 @@ public class Board {
         promotion[1] = new Rook(this, pawn.color, position);
         promotion[2] = new Bishop(this, pawn.color, position);
         promotion[3] = new Knight(this, pawn.color, position);
-    }
-
-    public void setBoard() {
-
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-
-                int id = row * 8 + col;
-
-                String color;
-                if (standard_color[id] == BLACK) {
-                    color = "black";
-                } else {
-                    color = "white";
-                }
-
-                Position position = new Position(row, col);
-                Piece newPiece = null;
-                switch (standard_piece[id]) {
-                    case PAWN:
-                        newPiece = new Pawn(this, color, position);
-                        break;
-                    case KNIGHT:
-                        newPiece = new Knight(this, color, position);
-                        break;
-                    case BISHOP:
-                        newPiece = new Bishop(this, color, position);
-                        break;
-                    case ROOK:
-                        newPiece = new Rook(this, color, position);
-                        break;
-                    case QUEEN:
-                        newPiece = new Queen(this, color, position);
-                        break;
-                    case KING:
-                        newPiece = new King(this, color, position);
-                        break;
-                    case EMPTY:
-                        break;
-                }
-
-
-                if (newPiece != null) {
-                    pieceList.add(newPiece);
-                    pieces[row][col] = newPiece;
-                }
-            }
-        }
     }
 
     public void doPromotion(int type) {

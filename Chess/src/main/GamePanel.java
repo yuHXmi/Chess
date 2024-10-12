@@ -2,8 +2,7 @@ package main;
 
 import ai.MoveSearcher;
 import board.Board;
-import pieces.King;
-import pieces.Piece;
+import pieces.*;
 import ui.UI;
 
 import javax.swing.*;
@@ -42,6 +41,39 @@ public class GamePanel extends JPanel implements Runnable {
     // UI
     UI ui;
 
+    // CHESS
+    public final int PAWN = 0;
+    public final int KNIGHT = 1;
+    public final int BISHOP = 2;
+    public final int ROOK = 3;
+    public final int QUEEN = 4;
+    public final int KING = 5;
+    public final int EMPTY = 6;
+    public final int BLACK = 7;
+    public final int WHITE = 8;
+
+    final int[] standard_piece = {
+            ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
+            PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
+            ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
+    };
+
+    final int[] standard_color = {
+            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+            WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,
+            WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
+    };
+
     public GamePanel() {
 
         setUpGame();
@@ -56,7 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void setUpGame() {
         ui = new UI(this);
         board = new Board(playerTurn);
-        board.setBoard();
+        setBoard();
         board.updatePiecesMoves();
     }
 
@@ -88,6 +120,54 @@ public class GamePanel extends JPanel implements Runnable {
                 lastPrint = currentTime;
 //                System.out.println(drawCount);
                 drawCount = 0;
+            }
+        }
+    }
+
+    void setBoard() {
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+
+                int id = row * 8 + col;
+
+                String color;
+                if (standard_color[id] == BLACK) {
+                    color = "black";
+                } else {
+                    color = "white";
+                }
+
+                Position position = new Position(row, col);
+                Piece newPiece = null;
+                switch (standard_piece[id]) {
+                    case PAWN:
+                        newPiece = new Pawn(board, color, position);
+                        break;
+                    case KNIGHT:
+                        newPiece = new Knight(board, color, position);
+                        break;
+                    case BISHOP:
+                        newPiece = new Bishop(board, color, position);
+                        break;
+                    case ROOK:
+                        newPiece = new Rook(board, color, position);
+                        break;
+                    case QUEEN:
+                        newPiece = new Queen(board, color, position);
+                        break;
+                    case KING:
+                        newPiece = new King(board, color, position);
+                        break;
+                    case EMPTY:
+                        break;
+                }
+
+
+                if (newPiece != null) {
+                    board.pieceList.add(newPiece);
+                    board.pieces[row][col] = newPiece;
+                }
             }
         }
     }
