@@ -47,6 +47,40 @@ public class Board {
 //        return moves;
 //    }
 
+    public String getPositionKey() {
+        StringBuilder key = new StringBuilder();
+
+        // Lưu trữ trạng thái của các quân cờ
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (pieces[row][col] != null) {
+                    key.append(pieces[row][col].type)
+                            .append(pieces[row][col].color.charAt(0)) // 'b' for black, 'w' for white
+                            .append(row)
+                            .append(col);
+                    if (pieces[row][col] instanceof King || pieces[row][col] instanceof Rook) {
+                        key.append(pieces[row][col].moved);
+                    }
+                }
+            }
+        }
+
+        // Lưu trữ trạng thái lượt chơi
+        key.append(playerTurn);
+
+        // Lưu trữ nước đi cuối cùng (nếu có)
+        if (lastMove != null) {
+            key.append(lastMove.start.row)
+                    .append(lastMove.start.col)
+                    .append(lastMove.end.row)
+                    .append(lastMove.end.col);
+        }
+
+        return key.toString();
+    }
+
+
+
     public Board copyBoard() {
 
         Board newBoard = new Board(playerTurn);

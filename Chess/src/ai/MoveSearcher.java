@@ -1,10 +1,18 @@
 package ai;
 
 import board.Board;
+import main.GamePanel;
 import main.Move;
 import pieces.Piece;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 public class MoveSearcher {
+
+    static GamePanel gp;
+
+    static Map<String, ArrayList<String>> openingMoves;
 
     final int maxDepth = 4;
     final int midGamePieceThreshold = 12;
@@ -13,6 +21,14 @@ public class MoveSearcher {
     String aiTurn;
     BoardEvaluator midGameEvaluate = new BoardEvaluator(0);
     BoardEvaluator endGameEvaluate = new BoardEvaluator(1);
+
+    public static void addGamePanel(GamePanel gamePanel) {
+        gp = gamePanel;
+    }
+
+    public static void addOpeningMoves(Map<String, ArrayList<String>> opening) {
+        openingMoves = opening;
+    }
 
     public MoveSearcher(Board board) {
         this.board = board;
@@ -24,6 +40,25 @@ public class MoveSearcher {
     }
 
     BoardValue search(int depth, Board board, String currentTurn, int alpha, int beta) {
+
+        String boardPosition = board.getPositionKey();  //tạo ra một key cho vị trí bàn cờ hiện tại
+        if (openingMoves.containsKey(boardPosition)) {
+            // Nếu vị trí bàn cờ khớp với một khai cuộc, thực hiện nước đi khai cuộc
+            ArrayList<String> moves = openingMoves.get(boardPosition);
+            String turn = "white";
+            Board newBoard = new Board(board.playerTurn);
+            gp.setBoard(newBoard);
+
+            System.out.println("**********");
+            for (int i = 0; i < Math.min(gp.countMove, moves.size()) ; i++) {
+                String nextMove = moves.get(i);
+                System.out.println(nextMove);
+                Move parsedMove = Move.parseMove(nextMove, newBoard, turn); // Chuyển string nước đi thành đối tượng Move
+                newBoard.makeMove(parsedMove);
+                turn = changeTurn(turn);
+            }
+            return new BoardValue(newBoard, 0);  // Trả về giá trị của bàn cờ sau khi thực hiện khai cuộc
+        }
 
         if (depth == 0) {
             if (board.pieceList.size() > midGamePieceThreshold) {

@@ -7,7 +7,9 @@ import ui.UI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -33,6 +35,7 @@ public class GamePanel extends JPanel implements Runnable {
     // BOARD & PIECES
     public Board board;
     public Piece pickedPiece;
+    public int countMove = 1;
 
     // PLAYER
     public String playerTurn = "white";
@@ -40,6 +43,11 @@ public class GamePanel extends JPanel implements Runnable {
 
     // UI
     UI ui;
+
+    // PNG READER
+    // Thêm biến lưu khai cuộc
+    PGNReader pgnReader = new PGNReader();
+    Map<String, ArrayList<String>> openingMoves;
 
     // CHESS
     public final int PAWN = 0;
@@ -88,8 +96,11 @@ public class GamePanel extends JPanel implements Runnable {
     public void setUpGame() {
         ui = new UI(this);
         board = new Board(playerTurn);
-        setBoard();
-        board.updatePiecesMoves();
+        setBoard(board);
+        PGNReader.addGamePanel(this);
+        openingMoves = pgnReader.readPGN("res/openings.pgn");  // Đường dẫn tới file PGN
+        MoveSearcher.addOpeningMoves(openingMoves);
+        MoveSearcher.addGamePanel(this);
     }
 
     public void launchGame() {
@@ -124,7 +135,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    void setBoard() {
+    public void setBoard(Board board) {
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -170,6 +181,8 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         }
+
+        board.updatePiecesMoves();
     }
 
     void getPromotion() {
@@ -284,6 +297,7 @@ public class GamePanel extends JPanel implements Runnable {
         changeTurnDelay = false;
         pickedPiece = null;
         currentTurn = currentTurn == "black" ? "white" : "black";
+        countMove++;
     }
 
     public void update() {
