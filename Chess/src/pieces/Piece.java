@@ -11,11 +11,9 @@ public abstract class Piece {
 
     Board board;
 
-    public String name;
     public String color;
     public int type;
     public Position position;
-    public int value;
     public boolean moved = false;
     public List<Move> moves = new ArrayList<>();
 
@@ -30,11 +28,6 @@ public abstract class Piece {
     void setDefaultValue() {}
 
     public boolean canAttackSquare(int row, int col) {
-
-        if (moves == null) {
-            return false;
-        }
-
         for (Move move : moves) {
             if (move.end.row == row && move.end.col == col) {
                 return true;
@@ -45,18 +38,8 @@ public abstract class Piece {
     }
 
     public void changePosition(Position position) {
-        this.position = position;
+        this.position = new Position(position.row, position.col);
         moved = true;
-    }
-
-    boolean isSafeSquare(int row, int col) {
-
-        for (Piece piece : board.pieceList) {
-            if (!piece.color.equals(color) && piece.canAttackSquare(row, col))
-                return false;
-        }
-
-        return true;
     }
 
     boolean isEmptySquare(int row, int col) {

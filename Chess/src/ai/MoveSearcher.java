@@ -25,22 +25,11 @@ public class MoveSearcher {
 
     BoardValue search(int depth, Board board, String currentTurn, int alpha, int beta) {
 
-        if (board.isStaleMate(currentTurn)) {
-            return new BoardValue(board, 0);
-        }
-
-        if (board.isCheckMate(currentTurn)) {
-            if (currentTurn == aiTurn) {
-                return new BoardValue(board, Integer.MAX_VALUE - depth);
-            }
-            return new BoardValue(board, Integer.MIN_VALUE + depth);
-        }
-
         if (depth == 0) {
-            if (board.pieceList.size() > 12) {
-                return new BoardValue(board, midGameEvaluate.evaluate(board, currentTurn));
+            if (board.pieceList.size() > midGamePieceThreshold) {
+                return new BoardValue(board, midGameEvaluate.evaluate(board));
             }
-            return new BoardValue(board, endGameEvaluate.evaluate(board, currentTurn));
+            return new BoardValue(board, endGameEvaluate.evaluate(board));
         }
 
         BoardValue nextBoard = new BoardValue(null, 0);
@@ -60,6 +49,10 @@ public class MoveSearcher {
                 Board newBoard = board.copyBoard();
                 newBoard.makeMove(move);
 
+                if (newBoard.kingIsAttacked(currentTurn)) {
+                    continue;
+                }
+
                 if (newBoard.checkPromotion()) {
 
                     Piece lastMovePiece = newBoard.pieces[newBoard.lastMove.end.row][newBoard.lastMove.end.col];
@@ -70,9 +63,6 @@ public class MoveSearcher {
                         cloneBoard.doPromotion(i);
 
                         BoardValue currentBoard = new BoardValue(cloneBoard, search(depth - 1, cloneBoard, changeTurn(currentTurn), alpha, beta).value);
-                        if (currentBoard.board.kingIsAttacked(currentTurn)) {
-                            continue;
-                        }
 
                         if (currentTurn == aiTurn) {
                             nextBoard.minimize(currentBoard);
@@ -89,9 +79,6 @@ public class MoveSearcher {
                 } else {
 
                     BoardValue currentBoard = new BoardValue(newBoard, search(depth - 1, newBoard, changeTurn(currentTurn), alpha, beta).value);
-                    if (currentBoard.board.kingIsAttacked(currentTurn)) {
-                        continue;
-                    }
 
                     if (currentTurn == aiTurn) {
                         nextBoard.minimize(currentBoard);
@@ -100,16 +87,16 @@ public class MoveSearcher {
                         nextBoard.maximize(currentBoard);
                         alpha = Math.max(alpha, currentBoard.value);
                     }
-                    if (depth == maxDepth) {
-                        System.out.print("Value searched: ");
-                        System.out.println(currentBoard.value);
-                    }
                 }
 
                 if (alpha >= beta) {
                     break;
                 }
             }
+        }
+
+        if (nextBoard.board == null && !board.kingIsAttacked(currentTurn)) {
+            nextBoard.value = 0;
         }
 
         return nextBoard;

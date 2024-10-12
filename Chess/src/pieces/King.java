@@ -14,9 +14,7 @@ public class King extends Piece {
     }
 
     void setDefaultValue() {
-        name = "king";
         type = 5;
-        value = 30000;
     }
 
     public boolean checkCastle(Piece rook) {
@@ -86,7 +84,7 @@ public class King extends Piece {
     @Override
     public List<Move> addMoves() {
 
-        List<Move> moves = new ArrayList<Move>();
+        List<Move> moves = new ArrayList<>();
         int[] dx = {-1, -1, -1, 0, 1, 1, 1, 0};
         int[] dy = {-1, 0, 1, 1, 1, 0, -1, -1};
 

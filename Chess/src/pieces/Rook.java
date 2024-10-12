@@ -14,9 +14,7 @@ public class Rook extends Piece {
     }
 
     void setDefaultValue() {
-        name = "rook";
         type = 3;
-        value = 500;
     }
 
     public List<Move> addMoves() {

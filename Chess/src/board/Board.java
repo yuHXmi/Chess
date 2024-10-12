@@ -43,6 +43,28 @@ public class Board {
         WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
     };
 
+//    final int[] standard_piece = {
+//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//            EMPTY, EMPTY, ROOK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, KING, EMPTY, EMPTY,
+//            PAWN, ROOK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//            EMPTY, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, KNIGHT,
+//            EMPTY, KING, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//    };
+//
+//    final int[] standard_color = {
+//            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+//            BLACK, BLACK, WHITE, BLACK, BLACK, BLACK, BLACK, WHITE,
+//            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+//            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+//            EMPTY, BLACK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+//            WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, BLACK,
+//            WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
+//    };
+
     public Piece[][] pieces = new Piece[8][8];
     public List<Piece> pieceList = new ArrayList<>();
     public Move lastMove = null;
@@ -51,44 +73,35 @@ public class Board {
     public Board(String playerTurn) {
 
         this.playerTurn = playerTurn;
-
-        setBoard();
     }
 
-    public List<Move> generateTacticalMoves(String currentTurn) {
-
-        List<Move> moves = new ArrayList<>();
-        for (Piece piece : pieceList) {
-
-            if (piece.color != currentTurn) {
-                continue;
-            }
-
-            for (Move move : piece.moves) {
-                if (isTakePiece(move)) {
-                    moves.add(move);
-                }
-            }
-        }
-
-        return moves;
-    }
+//    public List<Move> generateTacticalMoves(String currentTurn) {
+//
+//        List<Move> moves = new ArrayList<>();
+//        for (Piece piece : pieceList) {
+//
+//            if (piece.color != currentTurn) {
+//                continue;
+//            }
+//
+//            for (Move move : piece.moves) {
+//                if (isTakePiece(move)) {
+//                    moves.add(move);
+//                }
+//            }
+//        }
+//
+//        return moves;
+//    }
 
     public Board copyBoard() {
 
         Board newBoard = new Board(playerTurn);
-        newBoard.pieceList = new ArrayList<>();
 
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                if (pieces[row][col] != null) {
-                    Piece newPiece = copyPiece(newBoard, pieces[row][col]);
-                    newBoard.pieces[row][col]  = newPiece;
-                    newBoard.pieceList.add(newPiece);
-                } else {
-                    newBoard.pieces[row][col] = null;
-                }
-            }
+        for (Piece piece : pieceList) {
+            Piece clonePiece = copyPiece(newBoard, piece);
+            newBoard.pieces[piece.position.row][piece.position.col] = clonePiece;
+            newBoard.pieceList.add(clonePiece);
         }
 
         if (lastMove != null) {
@@ -131,7 +144,6 @@ public class Board {
                 break;
         }
 
-        newPiece.moves = new ArrayList<>();
         for (Move move : piece.moves) {
             newPiece.moves.add(copyMove(move));
         }
@@ -178,11 +190,11 @@ public class Board {
 
             pieceList.remove(pieces[newRow][newCol]);
             pieceList.remove(pieces[oldRow][oldCol]);
-            pieces[newRow][newCol] = pieces[oldRow][oldCol];
+            pieces[newRow][newCol] = copyPiece(this, pieces[oldRow][oldCol]);
             pieces[oldRow][oldCol] = null;
             pieces[newRow][newCol].changePosition(move.end);
             pieceList.add(pieces[newRow][newCol]);
-            lastMove = move;
+            lastMove = copyMove(move);
         }
 
         updatePiecesMoves();
@@ -228,8 +240,8 @@ public class Board {
 
     public void enPassant(Move move) {
         Position position = new Position(move.start.row, move.end.col);
-        makeMove(new Move(move.start, position));
         makeMove(new Move(position, move.end));
+        makeMove(new Move(move.start, move.end));
     }
 
     public void setPromotion(Piece pawn) {
@@ -243,7 +255,7 @@ public class Board {
         promotion[3] = new Knight(this, pawn.color, position);
     }
 
-    void setBoard() {
+    public void setBoard() {
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -282,9 +294,10 @@ public class Board {
                         break;
                 }
 
-                pieces[row][col] = newPiece;
+
                 if (newPiece != null) {
                     pieceList.add(newPiece);
+                    pieces[row][col] = newPiece;
                 }
             }
         }
@@ -315,9 +328,6 @@ public class Board {
 
         Piece king = findKing(kingColor);
 
-        if (king == null)
-            return false;
-
         for (Piece piece : pieceList) {
             if (piece.color != kingColor && piece.canAttackSquare(king.position.row, king.position.col)) {
                 return true;
@@ -331,10 +341,6 @@ public class Board {
 
         for (Piece piece : pieceList) {
             if (piece.color == color) {
-
-                if (piece.moves == null) {
-                    continue;
-                }
 
                 for (Move move : piece.moves) {
                     Board newBoard = this.copyBoard();

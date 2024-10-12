@@ -14,9 +14,7 @@ public class Bishop extends Piece {
     }
 
     void setDefaultValue() {
-        name = "bishop";
         type = 2;
-        value = 330;
     }
 
     public List<Move> addMoves() {

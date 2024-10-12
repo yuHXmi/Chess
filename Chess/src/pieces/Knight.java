@@ -14,9 +14,7 @@ public class Knight extends Piece {
     }
 
     void setDefaultValue() {
-        name = "knight";
         type = 1;
-        value = 320;
     }
 
     public List<Move> addMoves() {

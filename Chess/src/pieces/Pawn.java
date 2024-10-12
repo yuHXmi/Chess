@@ -16,9 +16,7 @@ public class Pawn extends Piece {
     }
 
     void setDefaultValue() {
-        name = "pawn";
         type = 0;
-        value = 100;
     }
 
     @Override

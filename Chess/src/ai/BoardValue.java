@@ -38,6 +38,7 @@ public class BoardValue {
         }
         if (value < other.value)
             return;
+
         Random rand = new Random();
         if (rand.nextInt(2) == 0) {
             board = other.board;

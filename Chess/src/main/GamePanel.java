@@ -56,6 +56,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void setUpGame() {
         ui = new UI(this);
         board = new Board(playerTurn);
+        board.setBoard();
         board.updatePiecesMoves();
     }
 
@@ -216,7 +217,7 @@ public class GamePanel extends JPanel implements Runnable {
             isEndGame = true;
         }
 
-        if (isEndGame == true) {
+        if (isEndGame) {
             return;
         }
 
@@ -236,10 +237,9 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             Board cloneBoard = board.copyBoard();
-            board.makeMove(nextMove);
-            if (board.kingIsAttacked(playerTurn)) {
+            cloneBoard.makeMove(nextMove);
+            if (!cloneBoard.kingIsAttacked(playerTurn)) {
                 board = cloneBoard;
-            } else {
                 changeTurn();
             }
         } else {

@@ -6,7 +6,6 @@ import pieces.Queen;
 
 public class BoardEvaluator {
 
-    Board board;
 
     final int MID_GAME = 0;
     final int END_GAME = 1;
@@ -17,9 +16,8 @@ public class BoardEvaluator {
     public final int ROOK = 3;
     public final int QUEEN = 4;
     public final int KING = 5;
-    public final int EMPTY = 6;
-    public final int BLACK = 7;
-    public final int WHITE = 8;
+
+    final int piecesValue[] = {100, 320, 330, 500, 900, 20000};
 
     int[][] pst = new int[6][64];
     final int flip[] = {
@@ -136,15 +134,17 @@ public class BoardEvaluator {
         }
     }
 
-    int evaluate(Board board, String color) {
+    int evaluate(Board board) {
 
         int value = 0;
         for (Piece piece : board.pieceList) {
 
-            int pieceValue = piece.value;
+            int pieceValue = piecesValue[piece.type];
+
             if (piece instanceof Queen) {
                 pieceValue += piece.moves.size();
             }
+
             if (piece.color == "white") {
                 pieceValue += pst[piece.type][piece.getID()];
             } else {
@@ -157,6 +157,7 @@ public class BoardEvaluator {
                 value -= pieceValue;
             }
         }
+
         return value;
     }
 

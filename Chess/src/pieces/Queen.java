@@ -14,9 +14,7 @@ public class Queen extends Piece {
     }
 
     void setDefaultValue() {
-        name = "queen";
         type = 4;
-        value = 900;
     }
 
     @Override
@@ -24,7 +22,7 @@ public class Queen extends Piece {
 
         Rook rook = new Rook(board, color, position);
         Bishop bishop = new Bishop(board, color, position);
-        List<Move> moves = new ArrayList<Move>();
+        List<Move> moves = new ArrayList<>();
         moves.addAll(rook.addMoves());
         moves.addAll(bishop.addMoves());
 
