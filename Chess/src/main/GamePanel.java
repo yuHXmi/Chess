@@ -1,5 +1,6 @@
 package main;
 
+import ai.BoardEvaluator;
 import ai.MoveSearcher;
 import board.Board;
 import pieces.*;
@@ -30,8 +31,15 @@ public class GamePanel extends JPanel implements Runnable {
     // SYSTEM
     Thread gameThread;
     public MouseHandler mouseH = new MouseHandler(this);
-    boolean isEndGame = false;
     boolean changeTurnDelay = false;
+
+    // GAME STATE
+    final int SELECT_SIDE = 0;
+    final int PLAYING = 1;
+    final int END_GAME = 2;
+
+    int gameState;
+
 
     // BOARD & PIECES
     public Board board;
@@ -39,7 +47,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Map<String, Integer> countBoardRepeat = new HashMap<>();
 
     // PLAYER
-    public String playerTurn = "white";
+    public String playerTurn;
     public String currentTurn = "white";
 
     // UI
@@ -95,7 +103,12 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setUpGame() {
+        gameState = SELECT_SIDE;
         ui = new UI(this);
+        setUpBoard();
+    }
+
+    public void setUpBoard() {
         board = new Board(playerTurn);
         setBoard(board);
         countBoardRepeat.put(board.getPositionKey(), 1);
@@ -193,7 +206,7 @@ public class GamePanel extends JPanel implements Runnable {
         int col = board.lastMove.end.col;
 
         int d;
-        if (playerTurn == "white") {
+        if (playerTurn.equals("white")) {
             d = 1;
         } else {
             d = -1;
@@ -299,13 +312,61 @@ public class GamePanel extends JPanel implements Runnable {
         changeTurnDelay = false;
         pickedPiece = null;
         currentTurn = currentTurn == "black" ? "white" : "black";
+        if (currentTurn == playerTurn) {
+            fixPlayerLegalMoves();
+        }
 
         String boardPosition = board.getPositionKey();
         int count = countBoardRepeat.getOrDefault(boardPosition, 0);
         countBoardRepeat.put(boardPosition, count + 1);
     }
 
+    void fixPlayerLegalMoves() {
+        for (Piece piece : board.pieceList) {
+            if (piece.color.equals(playerTurn)) {
+
+                ArrayList<Move> legalMoves = new ArrayList<>();
+                for (Move move : piece.moves) {
+
+                    Board cloneBoard = board.copyBoard();
+                    cloneBoard.makeMove(move);
+                    if (!cloneBoard.kingIsAttacked(playerTurn)) {
+                        legalMoves.add(move);
+                    }
+                }
+
+                piece.moves = legalMoves;
+            }
+        }
+    }
+
+    void gamePlay() {
+        gameState = PLAYING;
+        setUpBoard();
+    }
+
+    void selectSide() {
+        Rectangle blackRec = new Rectangle(229, 182, 150, 100);
+        Rectangle whiteRec = new Rectangle(229, 326, 150, 100);
+
+        if (mouseH.pressedX != -1) {
+            if (blackRec.contains(mouseH.pressedX, mouseH.pressedY)) {
+                playerTurn = "black";
+                gamePlay();
+            } else if (whiteRec.contains(mouseH.pressedX, mouseH.pressedY)) {
+                playerTurn = "white";
+                gamePlay();
+            }
+        }
+    }
+
     public void update() {
+
+        // Choose side
+        if (gameState == SELECT_SIDE) {
+            selectSide();
+            return;
+        }
 
         if (!changeTurnDelay) {
             changeTurnDelay = true;
@@ -313,10 +374,10 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if (board.isCheckMate(currentTurn) || board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey()) == 3) {
-            isEndGame = true;
+            gameState = END_GAME;
         }
 
-        if (isEndGame) {
+        if (gameState == END_GAME) {
             return;
         }
 
@@ -335,12 +396,8 @@ public class GamePanel extends JPanel implements Runnable {
                 return;
             }
 
-            Board cloneBoard = board.copyBoard();
-            cloneBoard.makeMove(nextMove);
-            if (!cloneBoard.kingIsAttacked(playerTurn)) {
-                board = cloneBoard;
-                changeTurn();
-            }
+            board.makeMove(nextMove);
+            changeTurn();
         } else {
             // get AI move
             MoveSearcher moveSearcher = new MoveSearcher(board);
@@ -359,6 +416,10 @@ public class GamePanel extends JPanel implements Runnable {
         ui.drawItems(g2);
         ui.drawAllPieces(g2);
         ui.drawPromotion(g2);
+
+        if (gameState == SELECT_SIDE) {
+            ui.drawSelection(g2);
+        }
 
         if (board.isCheckMate(currentTurn)) {
             ui.drawText(g2, "CHECKMATE!");

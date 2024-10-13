@@ -145,13 +145,13 @@ public class BoardEvaluator {
                 pieceValue += piece.moves.size();
             }
 
-            if (piece.color == "white") {
+            if (piece.color.equals("white")) {
                 pieceValue += pst[piece.type][piece.getID()];
             } else {
                 pieceValue += pst[piece.type][flip[piece.getID()]];
             }
 
-            if (piece.color == board.playerTurn) {
+            if (piece.color.equals(board.playerTurn)) {
                 value += pieceValue;
             } else {
                 value -= pieceValue;

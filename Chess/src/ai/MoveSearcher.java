@@ -86,9 +86,9 @@ public class MoveSearcher {
 
         BoardValue nextBoard = new BoardValue(null, 0);
         if (currentTurn == board.playerTurn) {
-            nextBoard.value = Integer.MIN_VALUE + depth;
+            nextBoard.value = Integer.MIN_VALUE + 10 - depth;
         } else {
-            nextBoard.value = Integer.MAX_VALUE - depth;
+            nextBoard.value = Integer.MAX_VALUE - 10 + depth;
         }
 
         for (Piece piece : board.pieceList) {

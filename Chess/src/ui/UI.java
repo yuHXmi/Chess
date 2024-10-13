@@ -17,12 +17,9 @@ public class UI {
     GamePanel gp;
 
     public OverlayNextMove overlayNextMove;
-    public OverlayLastMove overlayLastMove;
     public OverlayTake overlayTake;
     public OverlayCurrentSquare overlayCurrentSquare;
     public Font maruMonica;
-
-    BufferedImage boardImage;
 
     final String[] piecesName = {"pawn", "knight", "bishop", "rook", "queen", "king"};
     BufferedImage[] whitePiecesImage = new BufferedImage[6];
@@ -32,13 +29,11 @@ public class UI {
         this.gp = gp;
         setItems();
         setFont();
-        loadBoardImage();
         loadPiecesImage();
     }
 
     void setItems() {
         overlayNextMove = new OverlayNextMove(gp);
-        overlayLastMove = new OverlayLastMove(gp);
         overlayTake = new OverlayTake(gp);
         overlayCurrentSquare = new OverlayCurrentSquare(gp);
     }
@@ -49,14 +44,6 @@ public class UI {
             maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (FontFormatException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void loadBoardImage() {
-        try {
-            boardImage = ImageIO.read(getClass().getResourceAsStream("/board/board.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,15 +64,98 @@ public class UI {
         }
     }
 
+    public void drawSelection(Graphics2D g2) {
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f));
+
+        Color color1 = new Color(236,236,252);
+        Color color2 = new Color(180,196,220);
+
+        g2.setFont(maruMonica);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 50));
+
+        int width = 150;
+        int height = 100;
+        int x = (gp.screenWidth - width) / 2;
+        int y = gp.tileSize * 2 + 30;
+        // 229 182
+
+        g2.setColor(color1);
+        g2.fillRoundRect(x, y, width, height, 5, 5);
+
+        String text = "BLACK";
+        g2.setColor(Color.white);
+        g2.drawString(text, getXForCenteredText(g2, text) + 2, y + 67);
+        g2.setColor(Color.black);
+        g2.drawRoundRect(x, y, width, height, 5, 5);
+        g2.drawString(text, getXForCenteredText(g2, text), y + 65);
+
+
+        y = gp.tileSize * 6 - height - 30;
+        // 229 326
+
+        g2.setColor(color2);
+        g2.fillRoundRect(x, y, width, height, 5, 5);
+
+        text = "WHITE";
+        g2.setColor(Color.black);
+        g2.drawString(text, getXForCenteredText(g2, text) + 2, y + 67);
+        g2.setColor(Color.white);
+        g2.drawRoundRect(x, y, width, height, 5, 5);
+        g2.drawString(text, getXForCenteredText(g2, text), y + 65);
+
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+    }
+
     public void drawBoard(Graphics2D g2) {
-        g2.drawImage(boardImage, 0, 0, gp.screenWidth, gp.screenHeight, null);
+
+        Color color1 = new Color(236,236,252);
+        Color color2 = new Color(180,196,220);
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if ((row + col) % 2 == 0) {
+                    g2.setColor(color1);
+                } else {
+                    g2.setColor(color2);
+                }
+
+                g2.fillRect(col * gp.tileSize, row * gp.tileSize, gp.tileSize, gp.tileSize);
+            }
+        }
+
+        g2.setFont(maruMonica);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20));
+        for (int row = 0; row < 8; row++) {
+            if (row % 2 == 0) {
+                g2.setColor(color2);
+            } else {
+                g2.setColor(color1);
+            }
+            g2.drawString(String.valueOf(8 - row), 5,row * gp.tileSize + 20);
+        }
+
+        for (int col = 0; col < 8; col++) {
+            if (col % 2 == 0) {
+                g2.setColor(color1);
+            } else {
+                g2.setColor(color2);
+            }
+            g2.drawString(String.valueOf((char)('A' + col)), (col + 1) * gp.tileSize - 15, gp.screenHeight - 7);
+        }
+    }
+
+    public void drawLastMove(Graphics2D g2, int row, int col) {
+        g2.setColor(new Color(162, 253, 217));
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+        g2.fillRect(col * gp.tileSize, row * gp.tileSize, gp.tileSize, gp.tileSize);
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
     }
 
     public void drawItems(Graphics2D g2) {
 
         if (gp.board.lastMove != null) {
-            overlayLastMove.drawImage(g2, gp.board.lastMove.start.row, gp.board.lastMove.start.col);
-            overlayLastMove.drawImage(g2, gp.board.lastMove.end.row, gp.board.lastMove.end.col);
+            drawLastMove(g2, gp.board.lastMove.start.row, gp.board.lastMove.start.col);
+            drawLastMove(g2, gp.board.lastMove.end.row, gp.board.lastMove.end.col);
         }
 
         if (gp.mouseH.releaseX == -1 && gp.pickedPiece != null) {
@@ -206,12 +276,21 @@ public class UI {
         return x;
     }
 
+    public void drawDarkScreen(Graphics2D g2) {
+        g2.setColor(Color.black);
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+        g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+    }
+
     public void drawText(Graphics2D g2, String text) {
+        drawDarkScreen(g2);
         g2.setFont(maruMonica);
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60));
         g2.setColor(Color.white);
         g2.drawString(text, getXForCenteredText(g2, text) + 1, 304);
-        g2.setColor(Color.darkGray);
+        Color color = new Color(200,12,80);
+        g2.setColor(color);
         g2.drawString(text, getXForCenteredText(g2, text), 300);
     }
 }
