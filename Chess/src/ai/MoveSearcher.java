@@ -104,7 +104,7 @@ public class MoveSearcher {
         }
 
         BoardValue nextBoard = new BoardValue(null, 0);
-        if (currentTurn == board.playerTurn) {
+        if (currentTurn.equals(board.playerTurn)) {
             nextBoard.value = Integer.MIN_VALUE + 10 - depth;
         } else {
             nextBoard.value = Integer.MAX_VALUE - 10 + depth;
@@ -129,10 +129,12 @@ public class MoveSearcher {
                             }
                         }
                     }
+
                     moves.add(new MoveValue(move, value));
                 }
             }
         }
+
         for (int i = 0; i < moves.size(); i++) {
             sortMove(moves, i);
             Move move = moves.get(i).move;
@@ -169,7 +171,7 @@ public class MoveSearcher {
             } else {
 
                 int value;
-                String boardPosition = board.getPositionKey();
+                String boardPosition = board.getPositionKey2();
                 int count = gp.countBoardRepeat.getOrDefault(boardPosition, 0);
                 if (count == 2) {
                     value = 0;
@@ -209,9 +211,15 @@ public class MoveSearcher {
     }
 
     public Board getBoard() {
+        long startTime = System.nanoTime();
         BoardValue boardValue = findNextMove();
+        long endTime = System.nanoTime();
+        System.out.print("Search time: ");
+        System.out.print((double)(endTime - startTime) / 1e9);
+        System.out.println(" (s)");
         System.out.print("Move value: ");
         System.out.println(boardValue.value);
+        System.out.println();
         return boardValue.board;
     }
 }

@@ -47,7 +47,7 @@ public class Pawn extends Piece {
         } else {
             d = -1;
         }
-        List<Move> moves = new ArrayList<Move>();
+        List<Move> moves = new ArrayList<>();
 
         int row = position.row;
         int col = position.col;
@@ -79,29 +79,6 @@ public class Pawn extends Piece {
             if (!moved && isValidMove(row + d * 2, col)) {
                 moves.add(new Move(position, new Position(row + d * 2, col)));
             }
-        }
-
-        return moves;
-    }
-
-    public List<Move> addAttack() {
-        int d;
-        if (color.equals("black")) {
-            d = 1;
-        } else {
-            d = -1;
-        }
-        List<Move> moves = new ArrayList<Move>();
-
-        int row = position.row;
-        int col = position.col;
-
-        if (super.isValidAttack(row + d, col - 1)) {
-            moves.add(new Move(position, new Position(row + d, col - 1)));
-        }
-
-        if (super.isValidAttack(row + d, col + 1)) {
-            moves.add(new Move(position, new Position(row + d, col + 1)));
         }
 
         return moves;

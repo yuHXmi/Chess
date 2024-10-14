@@ -8,7 +8,7 @@ public class BoardEvaluator {
 
 
     final int MID_GAME = 0;
-    final int END_GAME = 1;
+//    final int END_GAME = 1;
 
     public final int PAWN = 0;
     public final int KNIGHT = 1;

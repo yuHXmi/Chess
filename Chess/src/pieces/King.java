@@ -59,7 +59,7 @@ public class King extends Piece {
     boolean isAttackedSquare(int row, int col) {
 
         for (Piece piece : board.pieceList) {
-            if (piece.color != color && piece.canAttackSquare(row, col)) {
+            if (!piece.color.equals(color) && piece.canAttackSquare(row, col)) {
                 return true;
             }
         }
@@ -73,7 +73,7 @@ public class King extends Piece {
             return false;
 
         for (Piece piece : board.pieceList) {
-            if (piece.color != color && piece.canAttackSquare(row, col)) {
+            if (!piece.color.equals(color) && piece.canAttackSquare(row, col)) {
                 return false;
             }
         }

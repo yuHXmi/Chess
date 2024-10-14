@@ -53,9 +53,7 @@ public class GamePanel extends JPanel implements Runnable {
     // UI
     UI ui;
 
-    // PNG READER
-    // Thêm biến lưu khai cuộc
-    PGNReader pgnReader = new PGNReader();
+    // OPENING
     Map<String, ArrayList<String>> openingMoves;
 
     // CHESS
@@ -111,9 +109,9 @@ public class GamePanel extends JPanel implements Runnable {
     public void setUpBoard() {
         board = new Board(playerTurn);
         setBoard(board);
-        countBoardRepeat.put(board.getPositionKey(), 1);
+        countBoardRepeat.put(board.getPositionKey2(), 1);
         PGNReader.addGamePanel(this);
-        openingMoves = pgnReader.readPGN("res/openings.pgn");  // Đường dẫn tới file PGN
+        openingMoves = PGNReader.readPGN("res/openings.pgn");
         MoveSearcher.addOpeningMoves(openingMoves);
         MoveSearcher.addGamePanel(this);
     }
@@ -128,7 +126,6 @@ public class GamePanel extends JPanel implements Runnable {
     public void run() {
 
         long lastPrint = System.nanoTime();
-        long drawCount = 0;
         long lastTime = System.nanoTime();
         long currentTime;
         while (gameThread != null) {
@@ -139,13 +136,10 @@ public class GamePanel extends JPanel implements Runnable {
             if (delta >= 1) {
                 update();
                 repaint();
-                drawCount++;
                 delta--;
             }
             if (currentTime - lastPrint >= 1000000000) {
                 lastPrint = currentTime;
-//                System.out.println(drawCount);
-                drawCount = 0;
             }
         }
     }
@@ -284,9 +278,9 @@ public class GamePanel extends JPanel implements Runnable {
 
             int x = col * tileSize + (tileSize - pieceSize) / 2;
             int y = row * tileSize + (tileSize - pieceSize) / 2;
-            Rectangle hitbox = new Rectangle(x, y, pieceSize, pieceSize);
+            Rectangle hitBox = new Rectangle(x, y, pieceSize, pieceSize);
 
-            if (board.pieces[row][col] != null && board.pieces[row][col].color.equals(playerTurn) && hitbox.contains(mouseH.pressedX, mouseH.pressedY)) {
+            if (board.pieces[row][col] != null && board.pieces[row][col].color.equals(playerTurn) && hitBox.contains(mouseH.pressedX, mouseH.pressedY)) {
                 pickedPiece = board.pieces[row][col];
             }
         }
@@ -317,7 +311,7 @@ public class GamePanel extends JPanel implements Runnable {
             fixPlayerLegalMoves();
         }
 
-        String boardPosition = board.getPositionKey();
+        String boardPosition = board.getPositionKey2();
         int count = countBoardRepeat.getOrDefault(boardPosition, 0);
         countBoardRepeat.put(boardPosition, count + 1);
     }
@@ -374,7 +368,7 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
-        if (board.isCheckMate(currentTurn) || board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey()) == 3) {
+        if (board.isCheckMate(currentTurn) || board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey2()) == 3) {
             gameState = END_GAME;
         }
 
@@ -390,7 +384,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         Move nextMove;
 
-        if (currentTurn == playerTurn) {
+        if (currentTurn.equals(playerTurn)) {
 
             nextMove = getPlayerMove();
             if (nextMove == null) {
@@ -425,7 +419,8 @@ public class GamePanel extends JPanel implements Runnable {
         if (board.isCheckMate(currentTurn)) {
             ui.drawText(g2, "CHECKMATE!");
         }
-        if (board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey()) == 3) {
+
+        if (board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey2()) == 3) {
             ui.drawText(g2, "STALEMATE!");
         }
 

@@ -22,7 +22,7 @@ public class PGNReader {
             ArrayList<String> moves = new ArrayList<>();
             String openingName = "";
             while ((line = br.readLine()) != null) {
-                // Xử lý tên khai cuộc
+
                 if (line.startsWith("[Opening")) {
                     if (!moves.isEmpty()) {
                         Board board = new Board(gp.playerTurn);
@@ -36,17 +36,15 @@ public class PGNReader {
                         }
                         moves = new ArrayList<>();
                     }
-                    openingName = line.split("\"")[1];  // Lấy tên khai cuộc
+                    openingName = line.split("\"")[1];
                 }
-                // Xử lý các biến thể
                 else if (line.startsWith("[Variation")) {
                     openingName += " (" + line.split("\"")[1] + ")";
                 }
-                // Nhận diện và phân tích các nước đi
                 else if (line.matches("^[0-9]+\\..*")) {
                     String[] parts = line.split(" ");
                     for (String move : parts) {
-                        if (!move.matches("^[0-9]+\\.")) {  // Bỏ qua số thứ tự lượt đi
+                        if (!move.matches("^[0-9]+\\.")) {
                             moves.add(move);
                         }
                     }
@@ -54,7 +52,7 @@ public class PGNReader {
             }
 
             if (!moves.isEmpty()) {
-                openings.put(openingName, moves);  // Lưu khai cuộc cuối cùng
+                openings.put(openingName, moves);
             }
         } catch (IOException e) {
             e.printStackTrace();

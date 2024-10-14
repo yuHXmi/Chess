@@ -31,7 +31,6 @@ public class Board {
     public String getPositionKey() {
         StringBuilder key = new StringBuilder();
 
-        // Lưu trữ trạng thái của các quân cờ
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if (pieces[row][col] != null) {
@@ -46,10 +45,8 @@ public class Board {
             }
         }
 
-        // Lưu trữ trạng thái lượt chơi
         key.append(playerTurn);
 
-        // Lưu trữ nước đi cuối cùng (nếu có)
         if (lastMove != null) {
             key.append(lastMove.start.row)
                     .append(lastMove.start.col)
@@ -60,7 +57,22 @@ public class Board {
         return key.toString();
     }
 
+    public String getPositionKey2() {
+        StringBuilder key = new StringBuilder();
 
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (pieces[row][col] != null) {
+                    key.append(pieces[row][col].type)
+                            .append(pieces[row][col].color.charAt(0)) // 'b' for black, 'w' for white
+                            .append(row)
+                            .append(col);
+                }
+            }
+        }
+
+        return key.toString();
+    }
 
     public Board copyBoard() {
 
@@ -90,30 +102,19 @@ public class Board {
 
     Piece copyPiece(Board board, Piece piece) {
 
-        Piece newPiece = null;
+        Piece newPiece;
         String color = piece.color;
         Position position = new Position(piece.position.row, piece.position.col);
 
-        switch (piece.type) {
-            case PAWN:
-                newPiece = new Pawn(board, color, position);
-                break;
-            case KNIGHT:
-                newPiece = new Knight(board, color, position);
-                break;
-            case BISHOP:
-                newPiece = new Bishop(board, color, position);
-                break;
-            case ROOK:
-                newPiece = new Rook(board, color, position);
-                break;
-            case QUEEN:
-                newPiece = new Queen(board, color, position);
-                break;
-            case KING:
-                newPiece = new King(board, color, position);
-                break;
-        }
+        newPiece = switch (piece.type) {
+            case PAWN -> new Pawn(board, color, position);
+            case KNIGHT -> new Knight(board, color, position);
+            case BISHOP -> new Bishop(board, color, position);
+            case ROOK -> new Rook(board, color, position);
+            case QUEEN -> new Queen(board, color, position);
+            case KING -> new King(board, color, position);
+            default -> null;
+        };
 
         for (Move move : piece.moves) {
             newPiece.moves.add(copyMove(move));
@@ -235,7 +236,7 @@ public class Board {
     Piece findKing(String kingColor) {
 
         for (Piece piece : pieceList) {
-            if (piece instanceof King && piece.color == kingColor) {
+            if (piece instanceof King && piece.color.equals(kingColor)) {
                 return piece;
             }
         }
@@ -248,7 +249,7 @@ public class Board {
         Piece king = findKing(kingColor);
 
         for (Piece piece : pieceList) {
-            if (piece.color != kingColor && piece.canAttackSquare(king.position.row, king.position.col)) {
+            if (!piece.color.equals(kingColor) && piece.canAttackSquare(king.position.row, king.position.col)) {
                 return true;
             }
         }
@@ -259,7 +260,7 @@ public class Board {
     boolean haveLegalMove(String color) {
 
         for (Piece piece : pieceList) {
-            if (piece.color == color) {
+            if (piece.color.equals(color)) {
 
                 for (Move move : piece.moves) {
                     Board newBoard = this.copyBoard();

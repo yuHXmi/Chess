@@ -189,7 +189,7 @@ public class UI {
     }
 
     BufferedImage getPieceImage(Piece piece) {
-        if (piece.color == "black") {
+        if (piece.color.equals("black")) {
             return blackPiecesImage[piece.type];
         }
         return whitePiecesImage[piece.type];
@@ -236,7 +236,7 @@ public class UI {
 
         int row = gp.board.lastMove.end.row;
         int col = gp.board.lastMove.end.col;
-        if (gp.playerTurn == "white") {
+        if (gp.playerTurn.equals("white")) {
 
             int x = gp.tileSize * col;
             int y = gp.tileSize * row;
@@ -255,7 +255,7 @@ public class UI {
         }
 
         int d;
-        if (gp.playerTurn == "white") {
+        if (gp.playerTurn.equals("white")) {
             d = 1;
         } else {
             d = -1;
@@ -272,8 +272,7 @@ public class UI {
     public int getXForCenteredText(Graphics2D g2, String text) {
 
         int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-        int x = gp.screenWidth / 2 - length / 2;
-        return x;
+        return gp.screenWidth / 2 - length / 2;
     }
 
     public void drawDarkScreen(Graphics2D g2) {

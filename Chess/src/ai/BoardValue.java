@@ -2,8 +2,6 @@ package ai;
 
 import board.Board;
 
-import java.util.Random;
-
 public class BoardValue {
 
     Board board;
