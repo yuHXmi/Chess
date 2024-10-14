@@ -64,8 +64,9 @@ public class GamePanel extends JPanel implements Runnable {
     public final int QUEEN = 4;
     public final int KING = 5;
     public final int EMPTY = 6;
-    public final int BLACK = 7;
-    public final int WHITE = 8;
+
+    public final int WHITE = 0;
+    public final int BLACK = 1;
 
     final int[] standard_piece = {
             ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
@@ -183,7 +184,6 @@ public class GamePanel extends JPanel implements Runnable {
                         break;
                 }
 
-
                 if (newPiece != null) {
                     board.pieceList.add(newPiece);
                     board.pieces[row][col] = newPiece;
@@ -221,8 +221,6 @@ public class GamePanel extends JPanel implements Runnable {
                 mouseH.pressedY = -1;
             }
         }
-
-        board.updatePiecesMoves();
     }
 
     Move movePiece() {
@@ -368,7 +366,7 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
-        if (board.isCheckMate(currentTurn) || board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey2()) == 3) {
+        if (board.isCheckMate(currentTurn) || board.isStaleMate(currentTurn) || countBoardRepeat.getOrDefault(board.getPositionKey2(), 0) == 3) {
             gameState = END_GAME;
         }
 
@@ -420,7 +418,7 @@ public class GamePanel extends JPanel implements Runnable {
             ui.drawText(g2, "CHECKMATE!");
         }
 
-        if (board.isStaleMate(currentTurn) || countBoardRepeat.get(board.getPositionKey2()) == 3) {
+        if (board.isStaleMate(currentTurn) || countBoardRepeat.getOrDefault(board.getPositionKey2(), 0) == 3) {
             ui.drawText(g2, "STALEMATE!");
         }
 

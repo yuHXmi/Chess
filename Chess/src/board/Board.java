@@ -231,6 +231,7 @@ public class Board {
         pieceList.remove(pieces[row][col]);
         pieces[row][col] = promotion[type];
         pieceList.add(pieces[row][col]);
+        updatePiecesMoves();
     }
 
     Piece findKing(String kingColor) {

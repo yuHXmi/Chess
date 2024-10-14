@@ -16,7 +16,6 @@ public class MoveSearcher {
     static Move[][] killer = new Move[256][2];
 
     static final int maxDepth = 6;
-    static final int midGamePieceThreshold = 12;
 
     static final int[][] MVV_LVA = {
         {15, 14, 13, 12, 11, 10},  // victim P, attacker P, N, B, R, K, Q
@@ -29,8 +28,8 @@ public class MoveSearcher {
 
     Board board;
     String aiTurn;
-    BoardEvaluator midGameEvaluate = new BoardEvaluator(0);
-    BoardEvaluator endGameEvaluate = new BoardEvaluator(1);
+    BoardEvaluator boardEvaluator = new BoardEvaluator();
+    boolean isOpening = true;
 
     public static void addGamePanel(GamePanel gamePanel) {
         gp = gamePanel;
@@ -76,9 +75,13 @@ public class MoveSearcher {
 
     BoardValue findNextMove() {
 
-        String boardPosition = board.getPositionKey();
-        if (openingMoves.containsKey(boardPosition)) {
-            return opening(boardPosition);
+        if (isOpening) {
+
+            String boardPosition = board.getPositionKey();
+            if (openingMoves.containsKey(boardPosition)) {
+                return opening(boardPosition);
+            }
+            isOpening = false;
         }
 
         return search(maxDepth, board, aiTurn, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -97,10 +100,7 @@ public class MoveSearcher {
     BoardValue search(int depth, Board board, String currentTurn, int alpha, int beta) {
 
         if (depth == 0) {
-            if (board.pieceList.size() > midGamePieceThreshold) {
-                return new BoardValue(board, midGameEvaluate.evaluate(board));
-            }
-            return new BoardValue(board, endGameEvaluate.evaluate(board));
+            return new BoardValue(board, boardEvaluator.evaluate(board));
         }
 
         BoardValue nextBoard = new BoardValue(null, 0);

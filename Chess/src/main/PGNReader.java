@@ -28,8 +28,14 @@ public class PGNReader {
                         Board board = new Board(gp.playerTurn);
                         gp.setBoard(board);
                         String currentTurn = "white";
-                        for (String move : moves) {
-                            openings.put(board.getPositionKey(), moves);
+                        for (int i = 0; i < moves.size(); i++) {
+
+                            ArrayList<String> existMove = openings.getOrDefault(board.getPositionKey(), null);
+                            if (existMove == null || existMove.size() < moves.size()) {
+                                openings.put(board.getPositionKey(), moves);
+                            }
+
+                            String move = moves.get(i);
                             Move realMove = Move.parseMove(move, board, currentTurn);
                             board.makeMove(realMove);
                             currentTurn = currentTurn.equals("white") ? "black" : "white";
