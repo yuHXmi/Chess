@@ -1,6 +1,5 @@
 package main;
 
-import ai.BoardEvaluator;
 import ai.MoveSearcher;
 import board.Board;
 import pieces.*;
@@ -45,6 +44,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Board board;
     public Piece pickedPiece;
     public Map<String, Integer> countBoardRepeat = new HashMap<>();
+    public int moveCount = 0;
 
     // PLAYER
     public String playerTurn;
@@ -309,10 +309,11 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void changeTurn() {
+        moveCount++;
         changeTurnDelay = false;
         pickedPiece = null;
-        currentTurn = currentTurn == "black" ? "white" : "black";
-        if (currentTurn == playerTurn) {
+        currentTurn = currentTurn.equals("black") ? "white" : "black";
+        if (currentTurn.equals(playerTurn)) {
             fixPlayerLegalMoves();
         }
 

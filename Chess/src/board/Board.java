@@ -79,7 +79,10 @@ public class Board {
         return newBoard;
     }
 
-    Move copyMove(Move other) {
+    public Move copyMove(Move other) {
+        if (other == null) {
+            return null;
+        }
         Position start = new Position(other.start.row, other.start.col);
         Position end = new Position(other.end.row, other.end.col);
         return new Move(start, end);

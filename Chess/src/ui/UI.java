@@ -65,7 +65,7 @@ public class UI {
     }
 
     public void drawSelection(Graphics2D g2) {
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f));
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
 
         Color color1 = new Color(236,236,252);
         Color color2 = new Color(180,196,220);
@@ -80,13 +80,13 @@ public class UI {
         // 229 182
 
         g2.setColor(color1);
-        g2.fillRoundRect(x, y, width, height, 5, 5);
+        g2.fillRoundRect(x, y, width, height, 20, 20);
 
         String text = "BLACK";
         g2.setColor(Color.white);
         g2.drawString(text, getXForCenteredText(g2, text) + 2, y + 67);
         g2.setColor(Color.black);
-        g2.drawRoundRect(x, y, width, height, 5, 5);
+        g2.drawRoundRect(x, y, width, height, 20, 20);
         g2.drawString(text, getXForCenteredText(g2, text), y + 65);
 
 
@@ -94,13 +94,13 @@ public class UI {
         // 229 326
 
         g2.setColor(color2);
-        g2.fillRoundRect(x, y, width, height, 5, 5);
+        g2.fillRoundRect(x, y, width, height, 20, 20);
 
         text = "WHITE";
         g2.setColor(Color.black);
         g2.drawString(text, getXForCenteredText(g2, text) + 2, y + 67);
         g2.setColor(Color.white);
-        g2.drawRoundRect(x, y, width, height, 5, 5);
+        g2.drawRoundRect(x, y, width, height, 20, 20);
         g2.drawString(text, getXForCenteredText(g2, text), y + 65);
 
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));

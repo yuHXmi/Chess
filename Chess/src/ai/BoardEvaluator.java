@@ -17,10 +17,10 @@ public class BoardEvaluator {
     public final int QUEEN = 4;
     public final int KING = 5;
 
-    final int piecesValue[] = {100, 320, 330, 500, 900, 20000};
+    final int[] piecesValue = {100, 320, 330, 500, 900, 20000};
 
     int[][] pst = new int[6][64];
-    final int flip[] = {
+    final int[] flip = {
         56, 57, 58, 59, 60, 61, 62, 63,
         48, 49, 50, 51, 52, 53, 54, 55,
         40, 41, 42, 43, 44, 45, 46, 47,
@@ -31,7 +31,7 @@ public class BoardEvaluator {
         0, 1, 2, 3, 4, 5, 6, 7
     };
 
-    final int pawn_mid_game[] = {
+    final int[] pawn_mid_game = {
         0,  0,  0,  0,  0,  0,  0,  0,
         50, 50, 50, 50, 50, 50, 50, 50,
         10, 10, 20, 30, 30, 20, 10, 10,
@@ -42,7 +42,7 @@ public class BoardEvaluator {
         0,  0,  0,  0,  0,  0,  0,  0
     };
 
-    final int pawn_end_game[] = {
+    final int[] pawn_end_game = {
         0,  0,  0,  0,  0,  0,  0,  0,
         30, 35, 40, 45, 45, 40, 35, 30,
         20, 25, 30, 35, 35, 30, 25, 20,
@@ -53,7 +53,7 @@ public class BoardEvaluator {
         0,  0,  0,  0,  0,  0,  0,  0
     };
 
-    final int king_mid_game[] = {
+    final int[] king_mid_game = {
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
@@ -64,7 +64,7 @@ public class BoardEvaluator {
         20, 30, 10,  0,  0, 10, 30, 20
     };
 
-    final int king_end_game[] = {
+    final int[] king_end_game = {
         -50,-40,-30,-20,-20,-30,-40,-50,
         -30,-20,-10,  0,  0,-10,-20,-30,
         -30,-10, 20, 30, 30, 20,-10,-30,
