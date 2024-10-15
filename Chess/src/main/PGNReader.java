@@ -16,6 +16,9 @@ public class PGNReader {
     public static Map<String, ArrayList<String>> readPGN(String filePath) {
 
         Map<String, ArrayList<String>> openings = new HashMap<>();
+        Map<String, Integer> currentCount = new HashMap<>();
+        Map<String, Integer> nextCount = new HashMap<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 
             String line;
@@ -28,17 +31,24 @@ public class PGNReader {
                         Board board = new Board(gp.playerTurn);
                         gp.setBoard(board);
                         String currentTurn = "white";
+                        String lastBoard;
                         for (int i = 0; i < moves.size(); i++) {
 
-                            ArrayList<String> existMove = openings.getOrDefault(board.getPositionKey(), null);
-                            if (existMove == null || existMove.size() < moves.size()) {
-                                openings.put(board.getPositionKey(), moves);
-                            }
+                            lastBoard = board.getPositionKey();
 
                             String move = moves.get(i);
                             Move realMove = Move.parseMove(move, board, currentTurn);
                             board.makeMove(realMove);
                             currentTurn = currentTurn.equals("white") ? "black" : "white";
+
+                            String currentBoard = board.getPositionKey();
+                            int count = currentCount.getOrDefault(currentBoard, 0) + moves.size() - i;
+                            currentCount.put(currentBoard, count);
+
+                            if (nextCount.getOrDefault(lastBoard, 0) < count) {
+                                openings.put(lastBoard, moves);
+                                nextCount.put(lastBoard, count);
+                            }
                         }
                         moves = new ArrayList<>();
                     }
